@@ -15,10 +15,10 @@ roots is a fast, simple, and customizable static site compiler
 - [x] compiler options
 - [x] before/after hooks
 - [x] multipass compiles
-- [ ] precompiled templates
+- [ ] precompiled templates (in progress)
 - [ ] dynamic content
 - [ ] custom compilers
-- [ ] deployment (ship)
+- [ ] deployment with ship
 - [ ] bower integration
 - [ ] another round of speed profiling
 
