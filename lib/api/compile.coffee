@@ -4,14 +4,16 @@ guard  = require 'when/guard'
 keys   = require 'when/keys'
 mkdirp = require 'mkdirp'
 
-FSParser = require '../fs_parser'
-Compiler = require '../compiler'
+FSParser    = require '../fs_parser'
+Compiler    = require '../compiler'
+Precompiler = require '../precompiler'
 
 class Compile
 
   constructor: (@roots) ->
     @fs_parser = new FSParser(@roots)
     @compiler = new Compiler(@roots)
+    @precompiler = new Precompiler(@roots)
 
   exec: ->
     @roots.emit('start')
@@ -56,6 +58,8 @@ class Compile
         .then(=> W.map(ast.compiled, @compiler.compile.bind(@compiler)))
       copy:
         W.map(ast.static, @compiler.copy.bind(@compiler))
+      precompile:
+        W.map(ast.client, @precompiler.compile.bind(@precompiler))
 
 module.exports = Compile
 
