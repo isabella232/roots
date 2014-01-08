@@ -38,11 +38,11 @@ class ParseTask
     return deferred.promise
 
   parse_file: (file) ->
-    yaml_parser.detect(file)
-      .then((res) =>
-        cat = if res then 'dynamic' else if compiled.call(@, file) then 'compiled' else 'static'
+    W.all([isCompiled.call(@, file), isDynamic.call(@, file)]).spread(
+      (v) =>
+        cat = if v[1] then 'dynamic' else if v[0] then 'compiled' else 'static'
         @ast[cat].push(file)
-      ).yield(@ast)
+    ).yield(@ast)
 
   # @api private
 
@@ -53,9 +53,14 @@ class ParseTask
   ignored = (f) ->
     @roots.config.ignores.map((i) -> minimatch(f, i, { dot: true })).filter((i) -> i).length
 
-  compiled = (f) ->
+  isDynamic = (f) ->
+    yaml_parser.detect(f).then (res) -> res?
+
+  isCompiled = (f) ->
+    d = W.defer()
     exts = _(@roots.config.compilers).map((i)-> i.extensions).flatten().value()
-    _.contains(exts, path.extname(f).slice(1))
+    d.resolve(_.contains(exts, path.extname(f).slice(1)))
+    d.promise
 
 module.exports = FSParser
 
